@@ -1,0 +1,62 @@
+;
+; KMDF-BSOD.inf
+;
+
+[Version]
+Signature   = "$WINDOWS NT$"
+Class       = System ; TODO: specify appropriate Class
+ClassGuid   = {4d36e97d-e325-11ce-bfc1-08002be10318} ; TODO: specify appropriate ClassGuid
+Provider    = %ManufacturerName%
+CatalogFile = KMDF-BSOD.cat
+DriverVer   = 04/02/2025, 1.0.0.0
+PnpLockdown = 1
+
+[DestinationDirs]
+DefaultDestDir = 13
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+KMDF-BSOD.sys = 1,,
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName% = Standard,NT$ARCH$.10.0...16299 ; %13% support introduced in build 16299
+
+[Standard.NT$ARCH$.10.0...16299]
+%KMDF-BSOD.DeviceDesc% = KMDF-BSOD_Device, Root\KMDF-BSOD ; TODO: edit hw-id
+
+[KMDF-BSOD_Device.NT]
+CopyFiles = File_Copy
+
+[File_Copy]
+KMDF-BSOD.sys
+
+;-------------- Service installation
+[KMDF-BSOD_Device.NT.Services]
+AddService = KMDF-BSOD,%SPSVCINST_ASSOCSERVICE%, KMDF-BSOD_Service_Inst
+
+; -------------- KMDF-BSOD driver install sections
+[KMDF-BSOD_Service_Inst]
+DisplayName    = %KMDF-BSOD.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %13%\KMDF-BSOD.sys
+
+[KMDF-BSOD_Device.NT.Wdf]
+KmdfService = KMDF-BSOD, KMDF-BSOD_wdfsect
+
+[KMDF-BSOD_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE = 0x00000002
+ManufacturerName = "m0n1x90"
+DiskName = "KMDF-BSOD Installation Disk"
+KMDF-BSOD.DeviceDesc = "KMDF-BSOD Device"
+KMDF-BSOD.SVCDESC = "KMDF-BSOD Service"
